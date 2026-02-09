@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 export const metadata = {
   title: 'Blog | Pata - Money, Finance & Tax Knowledge',
-  description: 'Learn about money, finance, wealth building, and taxes in Kenya.'
+  description: 'Learn about money, finance, wealth building, and taxes.'
 }
 
 export default function BlogIndex() {
@@ -17,7 +17,7 @@ export default function BlogIndex() {
         </Link>
         
         <h1 className="font-mono text-5xl font-bold mb-2">PATA / BLOG</h1>
-        <p className="font-mono text-lg mb-16">Money, finance, and tax knowledge for Kenya</p>
+        <p className="font-mono text-lg mb-16">Money, finance, and tax knowledge</p>
         
         <div className="space-y-8">
           {posts.map(post => (
