@@ -17,16 +17,16 @@ const components = {
   li: (props) => <li className="ml-6" {...props} />,
   strong: (props) => <strong className="font-bold text-red-600" {...props} />,
   em: (props) => <em className="italic" {...props} />,
-  code: ({ children, ...props }) => {
-    // Inside a <pre> block — no bg pill, just inherit
-    if (typeof children === 'string') {
-      return <code className="font-mono text-sm" {...props}>{children}</code>
+  // className is only present on block code (language-* or empty string from fenced blocks).
+  // Inline code never receives a className from MDX — use that to distinguish.
+  code: ({ children, className, ...props }) => {
+    if (className !== undefined) {
+      return <code className={`font-mono text-sm${className ? ` ${className}` : ''}`} {...props}>{children}</code>
     }
-    // Inline code
     return <code className="bg-red-600 text-white px-2 py-1 font-mono text-sm" {...props}>{children}</code>
   },
   pre: ({ children, ...props }) => {
-    // Strip the leading newline that MDX injects after the opening fence
+    // Strip the leading newline MDX injects after the opening fence
     let content = children
     if (
       content?.props?.children &&
@@ -48,14 +48,16 @@ const components = {
     )
   },
   blockquote: (props) => <blockquote className="border-l-4 border-red-600 pl-6 my-6 font-mono italic" {...props} />,
-  table: (props) => (
+  // Tables styled to match the calculation breakdown blocks:
+  // border-2 border-black outer shell, black header bar, divide-y-2 divide-black rows
+  table: ({ children, ...props }) => (
     <div className="border-2 border-black mb-6 overflow-x-auto">
-      <table className="font-mono w-full" {...props} />
+      <table className="font-mono w-full" {...props}>{children}</table>
     </div>
   ),
   thead: (props) => <thead className="bg-black text-white" {...props} />,
   tbody: (props) => <tbody className="divide-y-2 divide-black" {...props} />,
-  tr: (props) => <tr className="border-b border-black" {...props} />,
+  tr: (props) => <tr {...props} />,
   th: (props) => <th className="p-4 text-left font-bold font-mono text-sm" {...props} />,
   td: (props) => <td className="p-4 font-mono text-sm" {...props} />,
 }
