@@ -20,27 +20,40 @@ const components = {
   // className is only present on block code (language-* or empty string from fenced blocks).
   // Inline code never receives a className from MDX — use that to distinguish.
   code: ({ children, className, ...props }) => {
+    // className is only present on block code (language-* or empty string from fenced blocks).
+    // Inline code never receives a className from MDX — use that to distinguish.
     if (className !== undefined) {
       return <code className={`font-mono text-sm${className ? ` ${className}` : ''}`} {...props}>{children}</code>
     }
     return <code className="bg-red-600 text-white px-2 py-1 font-mono text-sm" {...props}>{children}</code>
   },
   pre: ({ children, ...props }) => {
-    // Strip any leading whitespace (space or newline) MDX injects after the opening fence
-    let content = children
-    if (
-      content?.props?.children &&
-      typeof content.props.children === 'string' &&
-      /^[\n ]/.test(content.props.children)
-    ) {
-      content = {
-        ...content,
-        props: {
-          ...content.props,
-          children: content.props.children.replace(/^[\n ]+/, ''),
-        },
+    // MDX can inject leading whitespace in several shapes. Normalise all of them.
+    const stripLeading = (str) => typeof str === 'string' ? str.replace(/^[\n ]+/, '') : str
+
+    const cleanCode = (codeEl) => {
+      if (!codeEl?.props) return codeEl
+      const c = codeEl.props.children
+      if (typeof c === 'string') {
+        return { ...codeEl, props: { ...codeEl.props, children: stripLeading(c) } }
       }
+      if (Array.isArray(c)) {
+        const cleaned = [stripLeading(c[0]), ...c.slice(1)]
+        return { ...codeEl, props: { ...codeEl.props, children: cleaned } }
+      }
+      return codeEl
     }
+
+    let content = children
+    if (Array.isArray(children)) {
+      // pre children is an array — drop any leading whitespace-only text nodes,
+      // then clean the first code element
+      const filtered = children.filter((c, i) => !(i === 0 && typeof c === 'string' && /^[\n ]+$/.test(c)))
+      content = filtered.map((c, i) => i === 0 ? cleanCode(c) : c)
+    } else {
+      content = cleanCode(children)
+    }
+
     return (
       <pre className="bg-black text-white pt-4 pb-6 px-6 overflow-x-auto mb-6 font-mono text-sm leading-relaxed" {...props}>
         {content}
