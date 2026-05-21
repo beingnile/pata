@@ -27,7 +27,7 @@ export default function OptimizePage() {
       setPayStatus('idle')
       setPayError('The M-Pesa prompt expired. Enter your number and try again.')
       setCheckoutId('')
-    }, 75000)
+    }, 65000)
 
     const interval = setInterval(async () => {
       try {
@@ -167,7 +167,7 @@ export default function OptimizePage() {
                   You are sending KSH {formatKsh(result.deductions.paye.net)} to KRA this month. Here is what four legal moves do to that number.
                 </h3>
                 <p className="font-mono text-xs md:text-sm mb-4 text-gray-700">
-                  We model each scenario against your exact gross of {formatKsh(result.grossSalary)} — not a generic estimate — and show you the monthly and yearly saving for each:
+                  We model each scenario against your exact gross of {formatKsh(result.grossSalary)} and show you the monthly and yearly saving for each:
                 </p>
                 <ul className="font-mono text-xs md:text-sm space-y-2 mb-6 list-disc list-inside text-gray-700">
                   <li>Max pension contribution — cuts your taxable income directly</li>
@@ -200,7 +200,7 @@ export default function OptimizePage() {
                         ? 'Check your phone...'
                         : payLoading
                           ? 'Processing...'
-                          : 'Unlock for KSH 350 — one time'}
+                          : 'Unlock for KSH 350'}
                     </button>
                     {payError && (
                       <p className="font-mono text-red-600 text-xs md:text-sm">{payError}</p>
@@ -246,7 +246,7 @@ function OptimizationResult({ grossSalary }) {
     },
     {
       name: 'Do All Three',
-      description: 'Pension KSH 15,000 + insurance KSH 5,000 + HOSP KSH 8,000. The power move.',
+      description: 'Pension KSH 15,000 + insurance KSH 5,000 + HOSP KSH 8,000.',
       pension: 15000,
       insurance: 5000,
       mortgage: 0,
