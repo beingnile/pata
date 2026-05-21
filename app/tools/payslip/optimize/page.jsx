@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
 function formatKsh(amount) {
@@ -8,9 +9,12 @@ function formatKsh(amount) {
 }
 
 export default function OptimizePage() {
+  const searchParams = useSearchParams()
   const [gross, setGross] = useState('')
   const [result, setResult] = useState(null)
   const [paid, setPaid] = useState(false)
+  const fromCalculator = useRef(false)
+  const resultsRef = useRef(null)
 
   const [phone, setPhone] = useState('')
   const [payLoading, setPayLoading] = useState(false)
@@ -21,8 +25,6 @@ export default function OptimizePage() {
   useEffect(() => {
     if (!checkoutId || payStatus !== 'pending') return
 
-    // STK push expires after 60s on Safaricom's end with no callback fired.
-    // After 75s we stop polling and reset so the user can try again.
     const timeout = setTimeout(() => {
       setPayStatus('idle')
       setPayError('The M-Pesa prompt expired. Enter your number and try again.')
@@ -58,10 +60,10 @@ export default function OptimizePage() {
     }
   }, [checkoutId, payStatus])
 
-  const handleAnalyze = useCallback(async () => {
+  const handleAnalyze = useCallback(async (salaryValue) => {
     setResult(null)
     setPayError('')
-    const value = Number(gross)
+    const value = Number(salaryValue ?? gross)
     if (Number.isNaN(value) || value <= 0) return
 
     try {
@@ -76,6 +78,26 @@ export default function OptimizePage() {
       // ignore
     }
   }, [gross])
+
+  // Auto-populate and analyze when arriving from the calculator
+  useEffect(() => {
+    const param = searchParams.get('gross')
+    if (param && Number(param) > 0) {
+      fromCalculator.current = true
+      setGross(param)
+      handleAnalyze(param)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Scroll results into view only when arriving from the calculator
+  useEffect(() => {
+    if (result && fromCalculator.current && resultsRef.current) {
+      setTimeout(() => {
+        resultsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 100)
+    }
+  }, [result])
 
   const handlePay = async (e) => {
     e.preventDefault()
@@ -123,13 +145,19 @@ export default function OptimizePage() {
             <input
               type="number"
               value={gross}
-              onChange={(e) => setGross(e.target.value)}
+              onChange={(e) => {
+                setGross(e.target.value)
+                fromCalculator.current = false
+              }}
               placeholder="e.g. 80000"
               className="flex-1 border-2 border-black p-4 font-mono text-lg focus:outline-none focus:bg-red-50"
               min="0"
             />
             <button
-              onClick={handleAnalyze}
+              onClick={() => {
+                fromCalculator.current = false
+                handleAnalyze()
+              }}
               className="bg-black text-white font-mono px-6 py-4 border-2 border-black hover:bg-red-600 hover:border-red-600 transition-colors"
             >
               Analyze
@@ -138,7 +166,7 @@ export default function OptimizePage() {
         </div>
 
         {result && (
-          <div className="space-y-8 mb-12">
+          <div ref={resultsRef} className="space-y-8 mb-12">
             <div className="border-2 border-black p-4 md:p-6 bg-gray-50">
               <h2 className="font-mono text-lg md:text-xl font-bold mb-4">Where You Stand Now</h2>
               <div className="grid grid-cols-2 gap-3 md:gap-4 font-mono text-xs md:text-sm">

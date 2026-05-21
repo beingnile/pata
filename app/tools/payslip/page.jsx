@@ -175,7 +175,7 @@ function PayslipBreakdown({ result }) {
           We will run the exact figures for your salary and show you which combination saves the most — and what to actually do about it.
         </p>
         <Link
-          href="/tools/payslip/optimize"
+          href={`/tools/payslip/optimize?gross=${result.grossSalary}`}
           className="inline-block bg-red-600 text-white font-mono text-xs md:text-sm px-4 md:px-6 py-2 md:py-3 border-2 border-red-600 hover:bg-black hover:border-black transition-colors"
         >
           Show me how much I can keep back &rarr; KSH 350 one-time
