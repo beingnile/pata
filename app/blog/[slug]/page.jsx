@@ -26,18 +26,18 @@ const components = {
     return <code className="bg-red-600 text-white px-2 py-1 font-mono text-sm" {...props}>{children}</code>
   },
   pre: ({ children, ...props }) => {
-    // Strip the leading newline MDX injects after the opening fence
+    // Strip any leading whitespace (space or newline) MDX injects after the opening fence
     let content = children
     if (
       content?.props?.children &&
       typeof content.props.children === 'string' &&
-      content.props.children.startsWith('\n')
+      /^[\n ]/.test(content.props.children)
     ) {
       content = {
         ...content,
         props: {
           ...content.props,
-          children: content.props.children.replace(/^\n/, ''),
+          children: content.props.children.replace(/^[\n ]+/, ''),
         },
       }
     }
@@ -48,18 +48,17 @@ const components = {
     )
   },
   blockquote: (props) => <blockquote className="border-l-4 border-red-600 pl-6 my-6 font-mono italic" {...props} />,
-  // Tables styled to match the calculation breakdown blocks:
-  // border-2 border-black outer shell, black header bar, divide-y-2 divide-black rows
+  // Tables styled to match the calculation code blocks: black background, white text, monospace
   table: ({ children, ...props }) => (
-    <div className="border-2 border-black mb-6 overflow-x-auto">
-      <table className="font-mono w-full" {...props}>{children}</table>
+    <div className="bg-black text-white mb-6 overflow-x-auto font-mono text-sm leading-relaxed">
+      <table className="w-full" {...props}>{children}</table>
     </div>
   ),
-  thead: (props) => <thead className="bg-black text-white" {...props} />,
-  tbody: (props) => <tbody className="divide-y-2 divide-black" {...props} />,
+  thead: (props) => <thead className="border-b-2 border-white" {...props} />,
+  tbody: (props) => <tbody className="divide-y divide-gray-700" {...props} />,
   tr: (props) => <tr {...props} />,
-  th: (props) => <th className="p-4 text-left font-bold font-mono text-sm" {...props} />,
-  td: (props) => <td className="p-4 font-mono text-sm" {...props} />,
+  th: (props) => <th className="px-6 pt-4 pb-3 text-left font-bold font-mono text-sm" {...props} />,
+  td: (props) => <td className="px-6 py-2 font-mono text-sm" {...props} />,
 }
 
 export async function generateStaticParams() {
