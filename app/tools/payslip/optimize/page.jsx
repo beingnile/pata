@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
@@ -8,8 +8,18 @@ function formatKsh(amount) {
   return `KSH ${Math.round(amount).toLocaleString('en-KE')}`
 }
 
-export default function OptimizePage() {
+// Reads ?gross= and calls onGross once on mount
+function SearchParamsReader({ onGross }) {
   const searchParams = useSearchParams()
+  useEffect(() => {
+    const param = searchParams.get('gross')
+    if (param && Number(param) > 0) onGross(param)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+  return null
+}
+
+export default function OptimizePage() {
   const [gross, setGross] = useState('')
   const [result, setResult] = useState(null)
   const [paid, setPaid] = useState(false)
@@ -79,16 +89,11 @@ export default function OptimizePage() {
     }
   }, [gross])
 
-  // Auto-populate and analyze when arriving from the calculator
-  useEffect(() => {
-    const param = searchParams.get('gross')
-    if (param && Number(param) > 0) {
-      fromCalculator.current = true
-      setGross(param)
-      handleAnalyze(param)
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  const handleParamGross = useCallback((param) => {
+    fromCalculator.current = true
+    setGross(param)
+    handleAnalyze(param)
+  }, [handleAnalyze])
 
   // Scroll results into view only when arriving from the calculator
   useEffect(() => {
@@ -126,6 +131,11 @@ export default function OptimizePage() {
 
   return (
     <div className="min-h-screen bg-white">
+      {/* Suspense boundary required by Next.js for useSearchParams */}
+      <Suspense fallback={null}>
+        <SearchParamsReader onGross={handleParamGross} />
+      </Suspense>
+
       <div className="max-w-3xl mx-auto px-6 py-12">
         <Link
           href="/tools/payslip"
