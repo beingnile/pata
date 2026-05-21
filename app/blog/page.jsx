@@ -12,7 +12,7 @@ export default function BlogIndex() {
   return (
     <div className="min-h-screen bg-white p-6 md:p-20">
       <div className="max-w-2xl mx-auto">
-        <Link href="/" className="font-mono underline decoration-red-600 mb-8 inline-block">
+        <Link href="/" className="font-mono underline decoration-red-600 mb-8 inline-block hover:bg-red-600 hover:text-white">
           &larr; Back home
         </Link>
 

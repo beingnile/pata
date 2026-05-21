@@ -17,15 +17,47 @@ const components = {
   li: (props) => <li className="ml-6" {...props} />,
   strong: (props) => <strong className="font-bold text-red-600" {...props} />,
   em: (props) => <em className="italic" {...props} />,
-  code: (props) => <code className="bg-red-600 text-white px-2 py-1 font-mono text-sm" {...props} />,
-  pre: (props) => <pre className="bg-black text-white p-6 overflow-x-auto mb-6 font-mono text-sm" {...props} />,
+  code: ({ children, ...props }) => {
+    // Inside a <pre> block — no bg pill, just inherit
+    if (typeof children === 'string') {
+      return <code className="font-mono text-sm" {...props}>{children}</code>
+    }
+    // Inline code
+    return <code className="bg-red-600 text-white px-2 py-1 font-mono text-sm" {...props}>{children}</code>
+  },
+  pre: ({ children, ...props }) => {
+    // Strip the leading newline that MDX injects after the opening fence
+    let content = children
+    if (
+      content?.props?.children &&
+      typeof content.props.children === 'string' &&
+      content.props.children.startsWith('\n')
+    ) {
+      content = {
+        ...content,
+        props: {
+          ...content.props,
+          children: content.props.children.replace(/^\n/, ''),
+        },
+      }
+    }
+    return (
+      <pre className="bg-black text-white pt-4 pb-6 px-6 overflow-x-auto mb-6 font-mono text-sm leading-relaxed" {...props}>
+        {content}
+      </pre>
+    )
+  },
   blockquote: (props) => <blockquote className="border-l-4 border-red-600 pl-6 my-6 font-mono italic" {...props} />,
-  table: (props) => <div className="overflow-x-auto mb-6"><table className="font-mono w-full border-2 border-black" {...props} /></div>,
+  table: (props) => (
+    <div className="border-2 border-black mb-6 overflow-x-auto">
+      <table className="font-mono w-full" {...props} />
+    </div>
+  ),
   thead: (props) => <thead className="bg-black text-white" {...props} />,
-  tbody: (props) => <tbody {...props} />,
+  tbody: (props) => <tbody className="divide-y-2 divide-black" {...props} />,
   tr: (props) => <tr className="border-b border-black" {...props} />,
-  th: (props) => <th className="p-4 text-left font-bold" {...props} />,
-  td: (props) => <td className="p-4" {...props} />,
+  th: (props) => <th className="p-4 text-left font-bold font-mono text-sm" {...props} />,
+  td: (props) => <td className="p-4 font-mono text-sm" {...props} />,
 }
 
 export async function generateStaticParams() {
