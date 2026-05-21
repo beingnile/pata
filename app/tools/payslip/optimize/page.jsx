@@ -94,7 +94,7 @@ export default function OptimizePage() {
           href="/tools/payslip"
           className="font-mono underline decoration-red-600 mb-8 inline-block hover:bg-red-600 hover:text-white transition-colors"
         >
-          &larr; Back to decoder
+          &larr; Back to Calculator
         </Link>
 
         <h1 className="font-mono text-4xl md:text-5xl font-bold mb-2">Tax Optimizer</h1>

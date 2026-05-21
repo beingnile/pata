@@ -15,7 +15,7 @@ export default function Home() {
             href="/tools/payslip"
             className="block bg-red-600 text-white font-mono text-lg px-12 py-4 border-2 border-white hover:bg-white hover:text-black transition-colors uppercase"
           >
-            Decode My Payslip
+            Calculate my tax
           </Link>
 
           <Link
@@ -29,18 +29,18 @@ export default function Home() {
         <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
           <Feature
             number="01"
-            title="Payslip Decoder"
-            description="Punch in your gross salary. See exactly how much goes to PAYE, NSSF, SHIF, and Housing Levy — line by line."
+            title="Tax Calculator"
+            description="Punch in your gross salary. See exactly how much goes to PAYE, NSSF, SHIF, and Housing Levy line by line."
           />
           <Feature
             number="02"
             title="Tax Optimizer"
-            description="Simulate what happens if you bump your pension, get insurance, or start saving for a house. Real numbers, no fluff."
+            description="Simulate what happens if you bump your pension, get insurance, or start saving for a house."
           />
           <Feature
             number="03"
             title="Built for Kenya"
-            description="KRA rates. Real deductions. No generic calculators that do not know what SHIF is."
+            description="KRA rates with real deductions."
           />
         </div>
       </div>

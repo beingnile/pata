@@ -57,7 +57,7 @@ export default function PayslipTool() {
           &larr; Back home
         </Link>
 
-        <h1 className="font-mono text-4xl md:text-5xl font-bold mb-2">Payslip Decoder</h1>
+        <h1 className="font-mono text-4xl md:text-5xl font-bold mb-2">Tax calculator</h1>
         <p className="font-mono text-lg text-gray-600 mb-8">
           Type in what your contract says you earn. We will show you where every shilling goes.
         </p>
@@ -82,7 +82,7 @@ export default function PayslipTool() {
             disabled={loading}
             className="w-full bg-black text-white font-mono text-lg px-8 py-4 border-2 border-black hover:bg-red-600 hover:border-red-600 transition-colors disabled:opacity-50 uppercase"
           >
-            {loading ? 'Crunching numbers...' : 'Decode My Payslip'}
+            {loading ? 'Crunching numbers...' : 'Calculate my tax'}
           </button>
           {error && (
             <p className="font-mono text-red-600 mt-4 text-sm">{error}</p>
