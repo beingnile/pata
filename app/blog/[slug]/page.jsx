@@ -28,31 +28,39 @@ const components = {
     return <code className="bg-red-600 text-white px-2 py-1 font-mono text-sm" {...props}>{children}</code>
   },
   pre: ({ children, ...props }) => {
-    // MDX can inject leading whitespace in several shapes. Normalise all of them.
-    const stripLeading = (str) => typeof str === 'string' ? str.replace(/^[\n ]+/, '') : str
-
-    const cleanCode = (codeEl) => {
-      if (!codeEl?.props) return codeEl
-      const c = codeEl.props.children
-      if (typeof c === 'string') {
-        return { ...codeEl, props: { ...codeEl.props, children: stripLeading(c) } }
+    // Recursively strip leading whitespace from the very first text node in the tree.
+    const stripLeadingDeep = (node) => {
+      if (typeof node === 'string') {
+        return node.replace(/^\s+/, '')
       }
-      if (Array.isArray(c)) {
-        const cleaned = [stripLeading(c[0]), ...c.slice(1)]
-        return { ...codeEl, props: { ...codeEl.props, children: cleaned } }
+      if (Array.isArray(node)) {
+        let stripped = false
+        const result = []
+        for (const child of node) {
+          if (!stripped) {
+            const cleaned = stripLeadingDeep(child)
+            if (typeof cleaned === 'string' && cleaned === '') continue
+            result.push(cleaned)
+            stripped = true
+          } else {
+            result.push(child)
+          }
+        }
+        return result
       }
-      return codeEl
+      if (node?.props?.children) {
+        return {
+          ...node,
+          props: {
+            ...node.props,
+            children: stripLeadingDeep(node.props.children),
+          },
+        }
+      }
+      return node
     }
 
-    let content = children
-    if (Array.isArray(children)) {
-      // pre children is an array — drop any leading whitespace-only text nodes,
-      // then clean the first code element
-      const filtered = children.filter((c, i) => !(i === 0 && typeof c === 'string' && /^[\n ]+$/.test(c)))
-      content = filtered.map((c, i) => i === 0 ? cleanCode(c) : c)
-    } else {
-      content = cleanCode(children)
-    }
+    const content = stripLeadingDeep(children)
 
     return (
       <pre className="bg-black text-white pt-4 pb-6 px-6 overflow-x-auto mb-6 font-mono text-sm leading-relaxed" {...props}>
@@ -63,15 +71,15 @@ const components = {
   blockquote: (props) => <blockquote className="border-l-4 border-red-600 pl-6 my-6 font-mono italic" {...props} />,
   // Tables styled to match the calculation code blocks: black background, white text, monospace
   table: ({ children, ...props }) => (
-    <div className="bg-black text-white mb-6 overflow-x-auto font-mono text-sm leading-relaxed">
+    <div className="bg-black text-white pt-4 pb-6 px-6 overflow-x-auto mb-6 font-mono text-sm leading-relaxed">
       <table className="w-full" {...props}>{children}</table>
     </div>
   ),
   thead: (props) => <thead className="border-b-2 border-white" {...props} />,
   tbody: (props) => <tbody className="divide-y divide-gray-700" {...props} />,
   tr: (props) => <tr {...props} />,
-  th: (props) => <th className="px-6 pt-4 pb-3 text-left font-bold font-mono text-sm" {...props} />,
-  td: (props) => <td className="px-6 py-2 font-mono text-sm" {...props} />,
+  th: (props) => <th className="pt-2 pb-3 text-left font-bold font-mono text-sm" {...props} />,
+  td: (props) => <td className="py-2 font-mono text-sm" {...props} />,
 }
 
 export async function generateStaticParams() {
