@@ -152,7 +152,7 @@ export default function OptimizePage() {
                   Want to see what is possible?
                 </h3>
                 <p className="font-mono text-xs md:text-sm mb-2 text-gray-700">
-                  One-time unlock. No subscription nonsense.
+                  One-time unlock without subscription.
                 </p>
                 <p className="font-mono text-xs md:text-sm mb-4 text-gray-700">
                   We will model four real scenarios for your salary:
