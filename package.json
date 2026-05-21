@@ -12,6 +12,7 @@
     "@mdx-js/loader": "^3.1.1",
     "@mdx-js/react": "^3.1.1",
     "@next/mdx": "^16.2.6",
+    "@upstash/redis": "^1.38.0",
     "gray-matter": "^4.0.3",
     "jose": "^6.2.3",
     "lru-cache": "^11.5.0",

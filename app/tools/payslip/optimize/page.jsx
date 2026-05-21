@@ -149,19 +149,16 @@ export default function OptimizePage() {
             {!paid ? (
               <div className="border-2 border-red-600 p-4 md:p-6">
                 <h3 className="font-mono text-base md:text-lg font-bold text-red-600 mb-2">
-                  Want to see what is possible?
+                  You are sending KSH {formatKsh(result.deductions.paye.net)} to KRA this month. Here is what four legal moves do to that number.
                 </h3>
-                <p className="font-mono text-xs md:text-sm mb-2 text-gray-700">
-                  One-time unlock without subscription.
-                </p>
                 <p className="font-mono text-xs md:text-sm mb-4 text-gray-700">
-                  We will model four real scenarios for your salary:
+                  We model each scenario against your exact gross of {formatKsh(result.grossSalary)} — not a generic estimate — and show you the monthly and yearly saving for each:
                 </p>
                 <ul className="font-mono text-xs md:text-sm space-y-2 mb-6 list-disc list-inside text-gray-700">
-                  <li>Bumping your pension to the KSH 20,000/month cap</li>
-                  <li>Getting private insurance and claiming the relief</li>
-                  <li>Deducting mortgage interest on your primary residence</li>
-                  <li>Stacking pension + insurance + HOSP together</li>
+                  <li>Max pension contribution — cuts your taxable income directly</li>
+                  <li>Private insurance — 15% of your premium comes back as a tax credit</li>
+                  <li>Mortgage interest — up to KSH 25,000/month off your taxable income</li>
+                  <li>Pension + insurance + HOSP stacked — the highest-saving combination</li>
                 </ul>
 
                 {payStatus !== 'success' && (

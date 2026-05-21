@@ -166,16 +166,19 @@ function PayslipBreakdown({ result }) {
 
       <div className="border-2 border-red-600 p-4 md:p-6 bg-red-50">
         <h3 className="font-mono text-base md:text-lg font-bold text-red-600 mb-2">
-          You are paying KSH {formatKsh(d.paye.net)} in tax every month
+          KSH {formatKsh(d.paye.net)} of that goes to KRA every month — not all of it has to
         </h3>
+        <p className="font-mono text-xs md:text-sm text-gray-700 mb-3">
+          Pension contributions, mortgage interest, HOSP savings, and insurance relief all reduce the taxable income that number is calculated from. Legally, through iTax.
+        </p>
         <p className="font-mono text-xs md:text-sm text-gray-700 mb-4">
-          There are legal ways to bring that number down. Pension contributions, mortgage interest, HOSP savings, and insurance relief all chip away at your tax bill. Here is how much you could save.
+          We will run the exact figures for your salary and show you which combination saves the most — and what to actually do about it.
         </p>
         <Link
           href="/tools/payslip/optimize"
           className="inline-block bg-red-600 text-white font-mono text-xs md:text-sm px-4 md:px-6 py-2 md:py-3 border-2 border-red-600 hover:bg-black hover:border-black transition-colors"
         >
-          Show me the savings &rarr; KSH 350 one-time
+          Show me how much I can keep back &rarr; KSH 350 one-time
         </Link>
       </div>
 
