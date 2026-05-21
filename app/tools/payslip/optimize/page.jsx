@@ -21,6 +21,14 @@ export default function OptimizePage() {
   useEffect(() => {
     if (!checkoutId || payStatus !== 'pending') return
 
+    // STK push expires after 60s on Safaricom's end with no callback fired.
+    // After 75s we stop polling and reset so the user can try again.
+    const timeout = setTimeout(() => {
+      setPayStatus('idle')
+      setPayError('The M-Pesa prompt expired. Enter your number and try again.')
+      setCheckoutId('')
+    }, 75000)
+
     const interval = setInterval(async () => {
       try {
         const res = await fetch(`/api/payment/status?checkoutRequestID=${checkoutId}`)
@@ -31,16 +39,23 @@ export default function OptimizePage() {
           setPayStatus('success')
           setPaid(true)
           clearInterval(interval)
+          clearTimeout(timeout)
         } else if (data.status === 'failed') {
-          setPayStatus('failed')
+          setPayStatus('idle')
+          setPayError('Payment was cancelled or declined. You can try again.')
+          setCheckoutId('')
           clearInterval(interval)
+          clearTimeout(timeout)
         }
       } catch {
-        // ignore
+        // ignore network blips, keep polling
       }
     }, 3000)
 
-    return () => clearInterval(interval)
+    return () => {
+      clearInterval(interval)
+      clearTimeout(timeout)
+    }
   }, [checkoutId, payStatus])
 
   const handleAnalyze = useCallback(async () => {
@@ -189,11 +204,6 @@ export default function OptimizePage() {
                     </button>
                     {payError && (
                       <p className="font-mono text-red-600 text-xs md:text-sm">{payError}</p>
-                    )}
-                    {payStatus === 'failed' && (
-                      <p className="font-mono text-red-600 text-xs md:text-sm">
-                        That did not work. Want to try again?
-                      </p>
                     )}
                   </form>
                 )}
