@@ -41,10 +41,10 @@ export default function FreelancerTaxPage() {
     <div className="min-h-screen bg-white">
       <div className="max-w-4xl mx-auto px-6 py-12">
         <Link
-          href="/"
+          href="/tools"
           className="font-mono underline decoration-red-600 mb-8 inline-block hover:bg-red-600 hover:text-white transition-colors"
         >
-          &larr; Back home
+          &larr; Back to tools
         </Link>
 
         <h1 className="font-mono text-4xl md:text-5xl font-bold mb-2">Freelancer Tax Guide</h1>

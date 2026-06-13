@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useSession, signOut } from 'next-auth/react'
+import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import {
   compressImage,
@@ -363,26 +363,12 @@ export default function ReceiptVaultPage() {
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-4xl mx-auto px-6 py-12">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-          <Link
-            href="/"
-            className="font-mono underline decoration-red-600 inline-block hover:bg-red-600 hover:text-white transition-colors"
-          >
-            &larr; Back home
-          </Link>
-          <div className="flex items-center gap-4 font-mono text-sm">
-            <span className="text-gray-600 truncate max-w-[200px]">{userEmail}</span>
-            <Link href="/account" className="underline hover:text-red-600">
-              Account
-            </Link>
-            <button
-              onClick={() => signOut({ callbackUrl: '/' })}
-              className="underline hover:text-red-600"
-            >
-              Sign out
-            </button>
-          </div>
-        </div>
+        <Link
+          href="/tools"
+          className="font-mono underline decoration-red-600 mb-8 inline-block hover:bg-red-600 hover:text-white transition-colors"
+        >
+          &larr; Back to tools
+        </Link>
 
         <h1 className="font-mono text-4xl md:text-5xl font-bold mb-2">Receipt Vault</h1>
         <p className="font-mono text-lg text-gray-600 mb-8">
