@@ -113,7 +113,12 @@ export default function OptimizePage() {
       const res = await fetch('/api/payment/stk', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, amount: 350 }),
+        body: JSON.stringify({
+          phone,
+          amount: 50,
+          accountReference: 'PataOptimize',
+          transactionDesc: 'Pata Tax Optimizer KSH 50',
+        }),
       })
 
       const data = await res.json()
@@ -238,7 +243,7 @@ export default function OptimizePage() {
                         ? 'Check your phone...'
                         : payLoading
                           ? 'Processing...'
-                          : 'Unlock for KSH 350'}
+                          : 'Unlock for KSH 50'}
                     </button>
                     {payError && (
                       <p className="font-mono text-red-600 text-xs md:text-sm">{payError}</p>

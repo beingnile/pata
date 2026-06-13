@@ -19,14 +19,28 @@ export default function Home() {
           </Link>
 
           <Link
-            href="/blog"
+            href="/tools/receipts"
             className="block bg-black text-white font-mono text-lg px-12 py-4 border-2 border-white hover:bg-white hover:text-black transition-colors uppercase"
+          >
+            Scan receipts
+          </Link>
+
+          <Link
+            href="/tools/freelancer"
+            className="block bg-black text-white font-mono text-lg px-12 py-4 border-2 border-white hover:bg-white hover:text-black transition-colors uppercase"
+          >
+            Freelancer taxes
+          </Link>
+
+          <Link
+            href="/blog"
+            className="block bg-white text-black font-mono text-lg px-12 py-4 border-2 border-white hover:bg-black hover:text-white transition-colors uppercase"
           >
             Read the Blog
           </Link>
         </div>
 
-        <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
+        <div className="mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-left">
           <Feature
             number="01"
             title="Tax Calculator"
@@ -39,6 +53,16 @@ export default function Home() {
           />
           <Feature
             number="03"
+            title="Receipt Vault"
+            description="Snap receipts with your phone, extract the totals and KRA details, and download a compressed archive."
+          />
+          <Feature
+            number="04"
+            title="Freelancer Tax Guide"
+            description="Compare Turnover Tax vs Standard Income Tax, estimate withholding tax, and see what to file."
+          />
+          <Feature
+            number="05"
             title="Built for Kenya"
             description="KRA rates with real deductions."
           />

@@ -25,7 +25,7 @@ export async function POST(request) {
       );
     }
 
-    const { phone: rawPhone, amount } = parsed.data;
+    const { phone: rawPhone, amount, accountReference = 'PataOptimize', transactionDesc } = parsed.data;
     const phoneCheck = sanitizePhone(rawPhone);
 
     if (!phoneCheck.valid) {
@@ -45,8 +45,8 @@ export async function POST(request) {
     const result = await initStkPush({
       phone: phoneCheck.formatted,
       amount,
-      accountReference: 'PataOptimize',
-      transactionDesc: `Pata Payslip Optimization KSH ${amount}`,
+      accountReference: accountReference.slice(0, 12),
+      transactionDesc: transactionDesc || `Pata service KSH ${amount}`,
       callbackUrl,
     });
 

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { updatePayment } from '@/lib/payments';
+import { updatePayment, getPayment } from '@/lib/payments';
+import { extendSubscription } from '@/lib/users';
 
 /**
  * Daraja STK Push callback endpoint
@@ -49,6 +50,16 @@ export async function POST(request) {
         transactionDate,
         completedAt: new Date().toISOString(),
       });
+
+      // If this was a subscription payment, extend the user's subscription.
+      try {
+        const paymentRecord = await getPayment(CheckoutRequestID);
+        if (paymentRecord?.accountReference === 'PataMonthly' && paymentRecord?.userEmail) {
+          await extendSubscription(paymentRecord.userEmail, 30, 'monthly');
+        }
+      } catch (subErr) {
+        console.error('Failed to extend subscription:', subErr);
+      }
     } else {
       // Failed payment
       console.log('Payment failed:', {
