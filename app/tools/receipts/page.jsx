@@ -13,6 +13,13 @@ import {
 
 const FREE_SCAN_LIMIT = 3
 const SUBSCRIPTION_PRICE = 500
+const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10 MB
+
+function formatFileSize(bytes) {
+  if (bytes < 1024) return `${bytes} B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+}
 
 function formatKsh(amount) {
   if (!amount || Number.isNaN(amount)) return 'KSH 0'
@@ -50,6 +57,7 @@ export default function ReceiptVaultPage() {
   const [receipts, setReceipts] = useState([])
   const [isProcessing, setIsProcessing] = useState(false)
   const [statusText, setStatusText] = useState('')
+  const [fileErrors, setFileErrors] = useState([])
 
   const [scanCount, setScanCount] = useState(0)
   const [subscription, setSubscription] = useState(null)
@@ -142,11 +150,18 @@ export default function ReceiptVaultPage() {
     async (files) => {
       if (!canScanNow) return
 
+      setFileErrors([])
+      const errors = []
       const allSources = []
 
       for (const file of Array.from(files)) {
+        if (file.size > MAX_FILE_SIZE) {
+          errors.push(`${file.name} is too large (max ${formatFileSize(MAX_FILE_SIZE)})`)
+          continue
+        }
+
         if (file.type === 'application/pdf') {
-          setStatusText('Converting PDF to images...')
+          setStatusText(`Converting ${file.name} to images...`)
           try {
             const images = await pdfToImages(file)
             images.forEach((blob, idx) => {
@@ -154,16 +169,22 @@ export default function ReceiptVaultPage() {
             })
           } catch (err) {
             console.error('PDF conversion failed:', err)
-            setStatusText('Failed to read PDF. Try an image instead.')
-            setIsProcessing(false)
-            return
+            errors.push(`Failed to read ${file.name}. Try an image instead.`)
           }
         } else if (file.type.startsWith('image/')) {
           allSources.push({ blob: file, name: file.name })
+        } else {
+          errors.push(`${file.name} is not a supported file type`)
         }
       }
 
-      if (allSources.length === 0) return
+      setFileErrors(errors)
+
+      if (allSources.length === 0) {
+        setIsProcessing(false)
+        setStatusText('')
+        return
+      }
 
       setIsProcessing(true)
       setStatusText('Compressing images...')
@@ -237,6 +258,7 @@ export default function ReceiptVaultPage() {
 
   const handleFileChange = useCallback(
     (e) => {
+      setFileErrors([])
       if (e.target.files?.length) {
         processFiles(e.target.files)
         e.target.value = ''
@@ -403,8 +425,18 @@ export default function ReceiptVaultPage() {
             className="w-full border-2 border-black p-4 font-mono text-sm file:mr-4 file:py-2 file:px-4 file:border-2 file:border-black file:bg-black file:text-white file:font-mono hover:file:bg-red-600 hover:file:border-red-600 disabled:opacity-50"
           />
           <p className="font-mono text-xs text-gray-500 mt-3">
-            Supports JPG, PNG, and PDF. Files are processed in your browser — nothing is uploaded.
+            Supports JPG, PNG, and PDF up to {formatFileSize(MAX_FILE_SIZE)} each. Files are processed in your browser — nothing is uploaded.
           </p>
+
+          {fileErrors.length > 0 && (
+            <div className="mt-4 space-y-1">
+              {fileErrors.map((err, i) => (
+                <p key={i} className="font-mono text-xs text-red-600">
+                  {err}
+                </p>
+              ))}
+            </div>
+          )}
 
           {statusText && (
             <div className="mt-4 flex items-center gap-3 font-mono text-sm">
