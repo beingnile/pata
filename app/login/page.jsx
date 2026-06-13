@@ -34,7 +34,12 @@ export default function LoginPage() {
     setLoading(false)
 
     if (result?.error) {
-      setError(result.error)
+      const messages = {
+        CredentialsSignin: 'Invalid email or password. Please try again.',
+        invalid_credentials: 'Invalid email or password. Please try again.',
+        OAuthAccountNotLinked: 'This email is linked to another sign-in method.',
+      }
+      setError(messages[result.error] || result.error)
       return
     }
 
