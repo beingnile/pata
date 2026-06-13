@@ -61,8 +61,8 @@ export default function SignupPage() {
           &larr; Back home
         </Link>
 
-        <h1 className="font-mono text-3xl md:text-4xl font-bold mb-2">Create account</h1>
-        <p className="font-mono text-gray-600 mb-8">Start with 3 free receipt scans.</p>
+        <h1 className="font-mono text-3xl md:text-4xl font-bold mb-2">Create your PATA account</h1>
+        <p className="font-mono text-gray-600 mb-8">Get access to tax tools, receipt scanning, and WHT tracking.</p>
 
         <form onSubmit={handleSubmit} className="border-2 border-black p-6 space-y-4">
           <div>

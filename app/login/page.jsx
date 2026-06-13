@@ -17,7 +17,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [callbackUrl, setCallbackUrl] = useState('/tools/receipts')
+  const [callbackUrl, setCallbackUrl] = useState('/account')
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -62,8 +62,8 @@ export default function LoginPage() {
           &larr; Back home
         </Link>
 
-        <h1 className="font-mono text-3xl md:text-4xl font-bold mb-2">Sign in</h1>
-        <p className="font-mono text-gray-600 mb-8">Access your Receipt Vault subscription.</p>
+        <h1 className="font-mono text-3xl md:text-4xl font-bold mb-2">Sign in to PATA</h1>
+        <p className="font-mono text-gray-600 mb-8">Access your tax tools, receipts, and account.</p>
 
         <form onSubmit={handleSubmit} className="border-2 border-black p-6 space-y-4">
           <div>
