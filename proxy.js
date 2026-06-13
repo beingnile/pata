@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getToken } from 'next-auth/jwt'
 
-const PROTECTED_PATHS = ['/tools/receipts', '/account', '/api/subscription', '/api/scans']
+const PROTECTED_PATHS = ['/tools/receipts', '/tools/wht-manager', '/account', '/api/subscription', '/api/scans', '/api/wht']
 
 function addSecurityHeaders(response, request) {
   response.headers.set('X-Frame-Options', 'DENY')

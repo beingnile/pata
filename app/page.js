@@ -71,6 +71,14 @@ export default function Home() {
               price="3 free, then KSH 500/mo"
               dark
             />
+            <FeatureCard
+              href="/tools/wht-manager"
+              title="WHT Manager"
+              description="Track withholding tax on supplier, freelancer, and landlord payments. Auto-calculate rates and export monthly WHT summaries."
+              cta="Manage WHT"
+              price="Included in KSH 500/mo"
+              dark
+            />
           </div>
         </div>
       </section>

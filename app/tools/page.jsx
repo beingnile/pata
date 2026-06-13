@@ -42,6 +42,13 @@ export default function ToolsPage() {
                   'Scan receipts and PDFs with OCR. Extract totals, dates, and KRA details. Export ZIP, JSON, and CSV.',
                 price: '3 free, then KSH 500/mo',
               },
+              {
+                href: '/tools/wht-manager',
+                title: 'WHT Manager',
+                description:
+                  'Track withholding tax on payments to suppliers, freelancers, and landlords. Calculate rates, record transactions, and export monthly summaries.',
+                price: 'Included in KSH 500/mo',
+              },
             ]}
             dark
           />
