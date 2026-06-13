@@ -1,13 +1,14 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useSession, signIn, signOut } from 'next-auth/react'
+import { useSession, signOut } from 'next-auth/react'
 import Link from 'next/link'
 import {
   compressImage,
   recognizeReceipt,
   parseReceiptText,
   downloadReceiptsZip,
+  pdfToImages,
 } from '@/lib/receipts'
 
 const FREE_SCAN_LIMIT = 3
@@ -16,6 +17,15 @@ const SUBSCRIPTION_PRICE = 500
 function formatKsh(amount) {
   if (!amount || Number.isNaN(amount)) return 'KSH 0'
   return `KSH ${Number(amount).toLocaleString('en-KE', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`
+}
+
+function formatCurrency(amount, currency = 'KSH') {
+  if (!amount || Number.isNaN(amount)) return `${currency} 0.00`
+  const symbol = currency === 'USD' || currency === '$' ? '$' : `${currency} `
+  return `${symbol}${Number(amount).toLocaleString('en-KE', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })}`
@@ -132,18 +142,38 @@ export default function ReceiptVaultPage() {
     async (files) => {
       if (!canScanNow) return
 
-      const imageFiles = Array.from(files).filter((file) => file.type.startsWith('image/'))
-      if (imageFiles.length === 0) return
+      const allSources = []
+
+      for (const file of Array.from(files)) {
+        if (file.type === 'application/pdf') {
+          setStatusText('Converting PDF to images...')
+          try {
+            const images = await pdfToImages(file)
+            images.forEach((blob, idx) => {
+              allSources.push({ blob, name: `${file.name.replace(/\.pdf$/i, '')}-page-${idx + 1}.jpg` })
+            })
+          } catch (err) {
+            console.error('PDF conversion failed:', err)
+            setStatusText('Failed to read PDF. Try an image instead.')
+            setIsProcessing(false)
+            return
+          }
+        } else if (file.type.startsWith('image/')) {
+          allSources.push({ blob: file, name: file.name })
+        }
+      }
+
+      if (allSources.length === 0) return
 
       setIsProcessing(true)
       setStatusText('Compressing images...')
 
-      for (const file of imageFiles) {
+      for (const source of allSources) {
         if (!subscribed && scanCount >= FREE_SCAN_LIMIT) break
 
         const id = generateId()
         try {
-          const compressedBlob = await compressImage(file)
+          const compressedBlob = await compressImage(source.blob)
           const imageUrl = URL.createObjectURL(compressedBlob)
           const imageName = `receipt-${id}.jpg`
 
@@ -151,7 +181,7 @@ export default function ReceiptVaultPage() {
             ...prev,
             {
               id,
-              fileName: file.name,
+              fileName: source.name,
               imageName,
               imageUrl,
               imageBlob: compressedBlob,
@@ -161,7 +191,9 @@ export default function ReceiptVaultPage() {
               date: '',
               time: '',
               receiptNo: '',
+              invoiceNo: '',
               kraPin: '',
+              currency: 'KSH',
               total: 0,
               tax: 0,
               rawText: '',
@@ -332,7 +364,7 @@ export default function ReceiptVaultPage() {
 
         <h1 className="font-mono text-4xl md:text-5xl font-bold mb-2">Receipt Vault</h1>
         <p className="font-mono text-lg text-gray-600 mb-8">
-          Snap or upload your receipts. We read the totals, dates, and KRA details, then pack
+          Snap, upload, or drop a PDF. We read the totals, dates, and tax details, then pack
           everything into a tidy ZIP you can keep for your records.
         </p>
 
@@ -360,10 +392,10 @@ export default function ReceiptVaultPage() {
             )}
           </div>
 
-          <label className="block font-mono text-sm font-bold mb-2">Add receipt photos</label>
+          <label className="block font-mono text-sm font-bold mb-2">Add receipt photos or PDFs</label>
           <input
             type="file"
-            accept="image/*"
+            accept="image/*,application/pdf"
             capture="environment"
             multiple
             onChange={handleFileChange}
@@ -371,7 +403,7 @@ export default function ReceiptVaultPage() {
             className="w-full border-2 border-black p-4 font-mono text-sm file:mr-4 file:py-2 file:px-4 file:border-2 file:border-black file:bg-black file:text-white file:font-mono hover:file:bg-red-600 hover:file:border-red-600 disabled:opacity-50"
           />
           <p className="font-mono text-xs text-gray-500 mt-3">
-            Works on your phone camera. Images are processed in your browser — nothing is uploaded.
+            Supports JPG, PNG, and PDF. Files are processed in your browser — nothing is uploaded.
           </p>
 
           {statusText && (
@@ -435,7 +467,7 @@ export default function ReceiptVaultPage() {
                 {doneCount > 0 && <span className="text-gray-600"> · {doneCount} scanned</span>}
               </p>
               <p className="font-mono text-sm text-gray-600">
-                Total: {formatKsh(totals.total)} · Tax: {formatKsh(totals.tax)}
+                Total: {formatCurrency(totals.total)} · Tax: {formatCurrency(totals.tax)}
               </p>
             </div>
             <button
@@ -528,16 +560,22 @@ function ReceiptCard({ receipt, onUpdate, onRemove }) {
               placeholder="e.g. Naivas Supermarket"
             />
             <Field
-              label="Receipt / Invoice No"
+              label="Invoice No"
+              value={receipt.invoiceNo}
+              onChange={(v) => onUpdate(receipt.id, 'invoiceNo', v)}
+              placeholder="e.g. F6MV8RKX-0001"
+            />
+            <Field
+              label="Receipt No"
               value={receipt.receiptNo}
               onChange={(v) => onUpdate(receipt.id, 'receiptNo', v)}
-              placeholder="e.g. 001234"
+              placeholder="e.g. 2789-1763"
             />
             <Field
               label="Date"
               value={receipt.date}
               onChange={(v) => onUpdate(receipt.id, 'date', v)}
-              placeholder="e.g. 12/06/2026"
+              placeholder="e.g. May 21, 2026"
             />
             <Field
               label="Time"
@@ -546,20 +584,26 @@ function ReceiptCard({ receipt, onUpdate, onRemove }) {
               placeholder="e.g. 14:30"
             />
             <Field
+              label="Currency"
+              value={receipt.currency}
+              onChange={(v) => onUpdate(receipt.id, 'currency', v)}
+              placeholder="e.g. USD"
+            />
+            <Field
               label="KRA PIN"
               value={receipt.kraPin}
               onChange={(v) => onUpdate(receipt.id, 'kraPin', v)}
               placeholder="e.g. P000111222A"
             />
             <Field
-              label="Total (KSH)"
+              label="Total"
               type="number"
               value={receipt.total}
               onChange={(v) => onUpdate(receipt.id, 'total', Number(v))}
               placeholder="0.00"
             />
             <Field
-              label="Tax / VAT (KSH)"
+              label="Tax / VAT"
               type="number"
               value={receipt.tax}
               onChange={(v) => onUpdate(receipt.id, 'tax', Number(v))}
