@@ -44,7 +44,7 @@ export default function SignupPage() {
         return
       }
 
-      router.push('/account')
+      router.push('/tools/receipts')
     } catch (err) {
       setError(err.message || 'Something went wrong')
       setLoading(false)
